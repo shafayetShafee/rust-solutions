@@ -1,5 +1,7 @@
-use std::error::Error;
 use clap::{App, Arg};
+use std::error::Error;
+use std::fs::File;
+use std::io::{self, BufRead, BufReader};
 
 #[derive(Debug)]
 
@@ -12,8 +14,32 @@ pub struct Config {
 type MyResult<T> = Result<T, Box<dyn Error>>;
 
 pub fn run(config: Config) -> MyResult<()> {
-    dbg!(config);
+    for filename in config.files {
+        match open(&filename) {
+	    Err(err) => eprintln!("Failed to open {}: {}", filename, err),
+	    Ok(file) => {
+		let mut line_count = 1;
+		for line in file.lines() {
+		    let line_content = line?;
+		    if config.number_nonblank_lines && line_content.is_empty() {
+	    	        println!("{}", line_content);
+			continue;
+		    }
+		    let line_prefix = if config.number_lines || config.number_nonblank_lines {format!("{}  ", line_count)} else { "".to_string() };  
+		    println!("{}{}", line_prefix, line_content);
+		    line_count += 1;
+		}
+	    },
+	}
+    }
     Ok(())
+}
+
+fn open(filename: &str) -> MyResult<Box<dyn BufRead>> {
+    match filename {
+        "-" => Ok(Box::new(BufReader::new(io::stdin()))),
+	_ => Ok(Box::new(BufReader::new(File::open(filename)?))),
+    }    
 }
 
 pub fn get_args() -> MyResult<Config> {
