@@ -22,10 +22,10 @@ pub fn run(config: Config) -> MyResult<()> {
 		for line in file.lines() {
 		    let line_content = line?;
 		    if config.number_nonblank_lines && line_content.is_empty() {
-	    	        println!("{}", line_content);
+	    	        println!();
 			continue;
 		    }
-		    let line_prefix = if config.number_lines || config.number_nonblank_lines {format!("{}  ", line_count)} else { "".to_string() };  
+		    let line_prefix = if config.number_lines || config.number_nonblank_lines {format!("{:>6}\t", line_count)} else { "".to_string() };  
 		    println!("{}{}", line_prefix, line_content);
 		    line_count += 1;
 		}
