@@ -1,0 +1,1 @@
+Contains solutions of exercises from [Yet Another Rust Resource (YARR!)](https://yarr.fyi/introduction).
